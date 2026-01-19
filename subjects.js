@@ -28,4 +28,4 @@ const subjects = [
   }
 ];
 
-module.exports = subjects;
+export default subjects;

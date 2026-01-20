@@ -60,7 +60,7 @@ const subjects = [
     qb2: null,
     ak1: null,
     ak2: null,
-    semqbwithans: null
+    semqbwithans: "https://drive.google.com/drive/folders/1869fjrG7AWWNRkhVpsI9QSS6eU5D8uD2?usp=drive_link"
   },
 ];
 

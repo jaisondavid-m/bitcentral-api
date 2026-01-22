@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import subjects from "./subjects.js";
+import subjects from "./data/subjects.js";
+import messRoutes from './routes/messRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,6 +21,7 @@ app.get("/api/subjects", (req, res) => {
     data: subjects
   });
 });
+app.use('/api/mess', messRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

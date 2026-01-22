@@ -1,21 +1,12 @@
 const subjects = [
   {
-    code: "22MA101",
-    name: "ENGINEERING MATHEMATICS I",
-    qb1: "https://drive.google.com/file/d/1AMpdasHFaaQ_VnTO5uXVJsXhK0OD9tGW/view",
-    qb2: "https://drive.google.com/file/d/1W7uvueoce4tlNBh8bUq0gcxVkLZhGkyq/view",
-    ak1: "https://drive.google.com/file/d/1TR4pbAxI11iDocwf2CYWlXaJ8d3Upcx2/view?usp=drivesdk",
-    ak2: "https://drive.google.com/file/d/12V_UdpMmw1gIaJBWJHswahvXgYLBirIR/view?usp=drivesdk",
-    semqbwithans: "https://drive.google.com/file/d/1s9E1qXI4sKJpppymAX9g674ZokkbboDM/view"
-  },
-  {
-    code: "22GE003",
-    name: "BASICS OF ELECTRICAL ENGINEERING",
-    qb1: "https://drive.google.com/file/d/1qt63H55kH9ur3D9HmCJoBsvKBjFomaVM/view",
-    qb2: "https://drive.google.com/file/d/1V1svxFy_fyBlh9eqV1mco1siJunKNegV/view",
-    ak1: null,
-    ak2: null,
-    semqbwithans: "https://drive.google.com/file/d/1yIDWBMOBk9KOL1ci8AMEBa98coydl2kF/view"
+    code: "22PH102",
+    name: "ENGINEERING PHYSICS",
+    qb1: "https://drive.google.com/file/d/1Rz12cLYbCulYXFnTYkO7nYM5p_O43NBj/view",
+    qb2: "https://drive.google.com/file/d/1ddivnmWnfv5YvWX5EwDVIq-GNhyIIMm3/view",
+    ak1: "https://drive.google.com/file/d/153GAPcOqOvwaqETazPUJ2-D6SjAPD962/view?usp=drivesdk",
+    ak2: "https://drive.google.com/file/d/1bM-10o00RoXj5kkihD7IvCI48P7G_lHu/view?usp=drivesdk",
+    semqbwithans: "https://drive.google.com/file/d/1toH56sk8jyqGYa4DjxjINO12yN6VIkC4/view"
   },
   {
     code: "22GE004",
@@ -25,15 +16,6 @@ const subjects = [
     ak1: null,
     ak2: null,
     semqbwithans: null
-  },
-  {
-    code: "22PH102",
-    name: "ENGINEERING PHYSICS",
-    qb1: "https://drive.google.com/file/d/1Rz12cLYbCulYXFnTYkO7nYM5p_O43NBj/view",
-    qb2: "https://drive.google.com/file/d/1ddivnmWnfv5YvWX5EwDVIq-GNhyIIMm3/view",
-    ak1: "https://drive.google.com/file/d/153GAPcOqOvwaqETazPUJ2-D6SjAPD962/view?usp=drivesdk",
-    ak2: "https://drive.google.com/file/d/1bM-10o00RoXj5kkihD7IvCI48P7G_lHu/view?usp=drivesdk",
-    semqbwithans: "https://drive.google.com/file/d/1toH56sk8jyqGYa4DjxjINO12yN6VIkC4/view"
   },
   {
     code: "22CH103",
@@ -61,6 +43,24 @@ const subjects = [
     ak1: null,
     ak2: null,
     semqbwithans: "https://drive.google.com/drive/folders/1869fjrG7AWWNRkhVpsI9QSS6eU5D8uD2?usp=sharing"
+  },
+  {
+    code: "22GE003",
+    name: "BASICS OF ELECTRICAL ENGINEERING",
+    qb1: "https://drive.google.com/file/d/1qt63H55kH9ur3D9HmCJoBsvKBjFomaVM/view",
+    qb2: "https://drive.google.com/file/d/1V1svxFy_fyBlh9eqV1mco1siJunKNegV/view",
+    ak1: null,
+    ak2: null,
+    semqbwithan: "https://drive.google.com/file/d/1yIDWBMOBk9KOL1ci8AMEBa98coydl2kF/view"
+  },
+  {
+    code: "22MA101",
+    name: "ENGINEERING MATHEMATICS I",
+    qb1: "https://drive.google.com/file/d/1AMpdasHFaaQ_VnTO5uXVJsXhK0OD9tGW/view",
+    qb2: "https://drive.google.com/file/d/1W7uvueoce4tlNBh8bUq0gcxVkLZhGkyq/view",
+    ak1: "https://drive.google.com/file/d/1TR4pbAxI11iDocwf2CYWlXaJ8d3Upcx2/view?usp=drivesdk",
+    ak2: "https://drive.google.com/file/d/12V_UdpMmw1gIaJBWJHswahvXgYLBirIR/view?usp=drivesdk",
+    semqbwithans: "https://drive.google.com/file/d/1s9E1qXI4sKJpppymAX9g674ZokkbboDM/view"
   },
 ];
 

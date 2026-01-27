@@ -1,14 +1,5 @@
 const subjects = [
   {
-    code: "22GE004",
-    name: "BASICS OF ELECTRONICS ENGINEERING",
-    qb1: "https://drive.google.com/file/d/1gAWZ8gWJ77lIPW7D2cIHymytV1U9WpuQ/view",
-    qb2: "https://drive.google.com/file/d/1zZ7rqdTKPb2xz6pQihuOWhTO2fXSEG6z/view",
-    ak1: "https://drive.google.com/file/d/1Ttksflz82KNMfL0FAqxRVGyk7i3uC2U0/view?usp=drivesdk",
-    ak2: "https://drive.google.com/file/d/1Na4U2pORBe9Fuk7LbNtu7a4Ad9x0FmkE/view?usp=drivesdk",
-    semqbwithans: "https://drive.google.com/file/d/1qzRyCwVgmGkCi8Z-NSclyPw3QSIP5LWB/view"
-  },
-  {
     code: "22CH103",
     name: "ENGINEERING CHEMISTRY I",
     qb1: "https://drive.google.com/file/d/1xtuVorFFOlxQRRaWNcWwCUHS3QOgUliQ/view",
@@ -61,6 +52,15 @@ const subjects = [
     ak1: "https://drive.google.com/file/d/153GAPcOqOvwaqETazPUJ2-D6SjAPD962/view?usp=drivesdk",
     ak2: "https://drive.google.com/file/d/1bM-10o00RoXj5kkihD7IvCI48P7G_lHu/view?usp=drivesdk",
     semqbwithans: "https://drive.google.com/file/d/1toH56sk8jyqGYa4DjxjINO12yN6VIkC4/view"
+  },
+  {
+    code: "22GE004",
+    name: "BASICS OF ELECTRONICS ENGINEERING",
+    qb1: "https://drive.google.com/file/d/1gAWZ8gWJ77lIPW7D2cIHymytV1U9WpuQ/view",
+    qb2: "https://drive.google.com/file/d/1zZ7rqdTKPb2xz6pQihuOWhTO2fXSEG6z/view",
+    ak1: "https://drive.google.com/file/d/1Ttksflz82KNMfL0FAqxRVGyk7i3uC2U0/view?usp=drivesdk",
+    ak2: "https://drive.google.com/file/d/1Na4U2pORBe9Fuk7LbNtu7a4Ad9x0FmkE/view?usp=drivesdk",
+    semqbwithans: "https://drive.google.com/file/d/1qzRyCwVgmGkCi8Z-NSclyPw3QSIP5LWB/view"
   }
 ];
 

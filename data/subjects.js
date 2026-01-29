@@ -5,7 +5,7 @@ const subjects = [
     qb1: "https://drive.google.com/file/d/1BqOhmS4z8gMdvbnjQGMsACN68wuMZ0Nv/view",
     qb2: "https://drive.google.com/file/d/1dQzJ2WdmyskKTG0JdGrL_1aHIlaov1WR/view",
     ak1: "https://drive.google.com/file/d/103DjNCSc7OUWPOsItHKjWMhpmWTSaAUu/view?usp=drivesdk",
-    ak2: null,
+    ak2: "https://drive.google.com/file/d/1twuBiLOeO24s-CjQRddsffcfexhGqHJH/view?usp=drivesdk",
     semqbwithans: "https://drive.google.com/file/d/1RMr0VXBNN5B_g32Rer_2UCMIvxVOtYLv/view?pli=1"
   },
   {
@@ -16,15 +16,6 @@ const subjects = [
     ak1: null,
     ak2: null,
     semqbwithans: "https://drive.google.com/drive/folders/1869fjrG7AWWNRkhVpsI9QSS6eU5D8uD2?usp=sharing"
-  },
-  {
-    code: "22GE003",
-    name: "BASICS OF ELECTRICAL ENGINEERING",
-    qb1: "https://drive.google.com/file/d/1qt63H55kH9ur3D9HmCJoBsvKBjFomaVM/view",
-    qb2: "https://drive.google.com/file/d/1V1svxFy_fyBlh9eqV1mco1siJunKNegV/view",
-    ak1: null,
-    ak2: null,
-    semqbwithan: "https://drive.google.com/file/d/1yIDWBMOBk9KOL1ci8AMEBa98coydl2kF/view"
   },
   {
     code: "22MA101",
@@ -44,6 +35,16 @@ const subjects = [
     ak2: "https://drive.google.com/file/d/1bM-10o00RoXj5kkihD7IvCI48P7G_lHu/view?usp=drivesdk",
     semqbwithans: "https://drive.google.com/file/d/1toH56sk8jyqGYa4DjxjINO12yN6VIkC4/view"
   },
+  {
+    code: "22GE003",
+    name: "BASICS OF ELECTRICAL ENGINEERING",
+    qb1: "https://drive.google.com/file/d/1qt63H55kH9ur3D9HmCJoBsvKBjFomaVM/view",
+    qb2: "https://drive.google.com/file/d/1V1svxFy_fyBlh9eqV1mco1siJunKNegV/view",
+    ak1: null,
+    ak2: null,
+    semqbwithan: "https://drive.google.com/file/d/1yIDWBMOBk9KOL1ci8AMEBa98coydl2kF/view"
+  },
+  
   {
     code: "22GE004",
     name: "BASICS OF ELECTRONICS ENGINEERING",

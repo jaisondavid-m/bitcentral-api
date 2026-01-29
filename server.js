@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import subjects from "./data/subjects.js";
 import messRoutes from './routes/messRoutes.js';
+import cardsRoutes from "./routes/cardsRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +27,8 @@ app.use('/api/mess', (req, res, next) => {
   res.set('Cache-Control', 'no-store');
   next();
 }, messRoutes);
+
+app.use("/api/cards", cardsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

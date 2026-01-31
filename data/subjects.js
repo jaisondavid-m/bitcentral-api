@@ -1,14 +1,5 @@
 const subjects = [
   {
-    code: "22GE001",
-    name: "FUNDAMENTALS OF COMPUTING",
-    qb1: "https://drive.google.com/file/d/1BqOhmS4z8gMdvbnjQGMsACN68wuMZ0Nv/view",
-    qb2: "https://drive.google.com/file/d/1dQzJ2WdmyskKTG0JdGrL_1aHIlaov1WR/view",
-    ak1: "https://drive.google.com/file/d/103DjNCSc7OUWPOsItHKjWMhpmWTSaAUu/view?usp=drivesdk",
-    ak2: "https://drive.google.com/file/d/1twuBiLOeO24s-CjQRddsffcfexhGqHJH/view?usp=drivesdk",
-    semqbwithans: "https://drive.google.com/file/d/1RMr0VXBNN5B_g32Rer_2UCMIvxVOtYLv/view?pli=1"
-  },
-  {
     code: "22HS002",
     name: "STARTUP MANAGEMENT",
     qb1: null,
@@ -16,6 +7,15 @@ const subjects = [
     ak1: null,
     ak2: null,
     semqbwithans: "https://drive.google.com/drive/folders/1869fjrG7AWWNRkhVpsI9QSS6eU5D8uD2?usp=sharing"
+  },
+  {
+    code: "22GE001",
+    name: "FUNDAMENTALS OF COMPUTING",
+    qb1: "https://drive.google.com/file/d/1BqOhmS4z8gMdvbnjQGMsACN68wuMZ0Nv/view",
+    qb2: "https://drive.google.com/file/d/1dQzJ2WdmyskKTG0JdGrL_1aHIlaov1WR/view",
+    ak1: "https://drive.google.com/file/d/103DjNCSc7OUWPOsItHKjWMhpmWTSaAUu/view?usp=drivesdk",
+    ak2: "https://drive.google.com/file/d/1twuBiLOeO24s-CjQRddsffcfexhGqHJH/view?usp=drivesdk",
+    semqbwithans: "https://drive.google.com/file/d/1RMr0VXBNN5B_g32Rer_2UCMIvxVOtYLv/view?pli=1"
   },
   {
     code: "22MA101",

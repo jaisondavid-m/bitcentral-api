@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import subjects from "./data/subjects.js";
+import semestersData from "./data/subjects.js";
 import messRoutes from './routes/messRoutes.js';
 import cardsRoutes from "./routes/cardsRoutes.js";
 
@@ -15,13 +15,24 @@ app.get("/", (req, res) => {
   res.send("Subjects API running 🚀");
 });
 
-app.get("/api/subjects", (req, res) => {
+app.get("/api/semesters/:year", (req, res) => {
+  const year = parseInt(req.params.year);
+  
+  if (!semestersData[year]) {
+    return res.status(404).json({
+      success: false,
+      message: `Year ${year} not found`
+    });
+  }
+  
   res.status(200).json({
     success: true,
-    count: subjects.length,
-    data: subjects
+    year: year,
+    count: semestersData[year].length,
+    data: semestersData[year] 
   });
 });
+
 // app.use('/api/mess', messRoutes);
 app.use('/api/mess', (req, res, next) => {
   res.set('Cache-Control', 'no-store');

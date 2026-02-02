@@ -1,24 +1,10 @@
 const cards = [
   {
-    img: "./CardImgs/image.png",
-    name: "SEM 1 Materials",
-    keywords: ["sem1", "semester 1", "materials", "notes", "study"],
-    link: "/sem1mat",
-    btntext: "Open Now"
-  },
-  {
     img: "./CardImgs/rewardpoint.png",
     name: "RP Checker",
     keywords: ["rp", "reward points", "points", "checker"],
     link: "/rpsite",
     btntext: "Check RP Now"
-  },
-  {
-    img: "./CardImgs/hallfinder.png",
-    name: "Exam Hall Finder",
-    keywords: ["exam", "hall", "exam hall", "finder"],
-    link: "https://exam-hall-finder.vercel.app/",
-    btntext: "Find Your Hall"
   },
   {
     img: "./CardImgs/bitmenu.png",
@@ -28,15 +14,29 @@ const cards = [
     btntext: "View Details"
   },
   {
+    img: "./CardImgs/image.png",
+    name: "Semester Material",
+    keywords: ["sem1", "semester 1","materials", "notes", "study"],
+    link: "/semester",
+    btntext: "Open Now"
+  },
+  {
+    img: "./CardImgs/hallfinder.png",
+    name: "Exam Hall Finder",
+    keywords: ["exam", "hall", "exam hall", "finder"],
+    link: "https://exam-hall-finder.vercel.app/",
+    btntext: "Find Your Hall"
+  },
+  {
     img: "./CardImgs/studyimg.jpg",
-    name: "Wiki Page📖",
+    name: "Wiki Page",
     keywords: ["wiki page", "page", "materials", "study"],
     link: "https://wiki.bitsathy.ac.in/wiki/BITWIKI:Departments_and_Semesters_2025-2026#2022_Regulation",
     btntext: "Open Material"
   },
   {
     img: "./CardImgs/leaveimg.webp",
-    name: "Leave Apply✈️",
+    name: "Leave Apply",
     keywords: ["leave", "holiday", "gp"],
     link: "https://ps.bitsathy.ac.in/activity/my-leaves",
     btntext: "Open Link"

@@ -31,6 +31,13 @@ func SetupRouter(
 		MaxAge:           12 * time.Hour,
 	}))
 
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "ok",
+			"time":   time.Now().UTC().Format(time.RFC3339),
+		})
+	})
+
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
 

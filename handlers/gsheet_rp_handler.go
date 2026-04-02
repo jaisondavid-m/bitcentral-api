@@ -235,6 +235,7 @@ func (h *SheetHandler) UniversalSearch(c *gin.Context) {
 	if query == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Query param 'q' is required",
+			"example": "/search?q=Abishek  or  /search?q=7376231CS106",
 		})
 		return
 	}

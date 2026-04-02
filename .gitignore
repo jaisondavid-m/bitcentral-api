@@ -1,0 +1,5 @@
+.env
+*.json
+firebase_credentials.json
+oauth_credentials.json
+token.json

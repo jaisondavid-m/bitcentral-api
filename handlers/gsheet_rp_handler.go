@@ -1,0 +1,322 @@
+package handlers
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/option"
+	"google.golang.org/api/sheets/v4"
+
+	"server/models"
+)
+
+var defaultTabs = []string{
+	"INDEX", "Details", "MTRS", "MECH", "IT", "ISE", "FD",
+	"FT", "EIE", "ECE", "EEE", "CT", "CSE", "CSD", "CSBS",
+	"CIVIL", "BT", "BIOMEDICAL", "AI&DS", "AGRI", "AIML",
+}
+
+// SheetHandler holds dependencies for auth and sheet operations.
+type SheetHandler struct {
+	oauthConfig *oauth2.Config
+	sheetsSvc   *sheets.Service
+	oauthToken  *oauth2.Token
+	tabs        []string
+	mu          sync.RWMutex
+}
+
+func NewSheetHandler() *SheetHandler {
+	return &SheetHandler{tabs: defaultTabs}
+}
+
+func (h *SheetHandler) InitOAuth() {
+	h.oauthConfig = &oauth2.Config{
+		ClientID:     os.Getenv("CLIENT_ID"),
+		ClientSecret: os.Getenv("CLIENT_SECRET"),
+		RedirectURL:  os.Getenv("REDIRECT_URL"),
+		Scopes:       []string{sheets.SpreadsheetsReadonlyScope},
+		Endpoint:     google.Endpoint,
+	}
+}
+
+func (h *SheetHandler) LoadSavedToken() bool {
+	f, err := os.Open("token.json")
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+
+	tok := &oauth2.Token{}
+	if err := json.NewDecoder(f).Decode(tok); err != nil {
+		return false
+	}
+
+	h.oauthToken = tok
+	if err := h.createSheetsService(); err != nil {
+		return false
+	}
+	return true
+}
+
+func (h *SheetHandler) saveToken(token *oauth2.Token) {
+	f, err := os.Create("token.json")
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	_ = json.NewEncoder(f).Encode(token)
+}
+
+func (h *SheetHandler) createSheetsService() error {
+	if h.oauthConfig == nil || h.oauthToken == nil {
+		return fmt.Errorf("oauth config or token not initialized")
+	}
+
+	client := h.oauthConfig.Client(context.Background(), h.oauthToken)
+	srv, err := sheets.NewService(context.Background(), option.WithHTTPClient(client))
+	if err != nil {
+		return err
+	}
+
+	h.mu.Lock()
+	h.sheetsSvc = srv
+	h.mu.Unlock()
+	return nil
+}
+
+func (h *SheetHandler) getSheetsService() *sheets.Service {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	return h.sheetsSvc
+}
+
+func (h *SheetHandler) HandleLogin(c *gin.Context) {
+	url := h.oauthConfig.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (h *SheetHandler) HandleCallback(c *gin.Context) {
+	code := c.Query("code")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing authorization code"})
+		return
+	}
+
+	token, err := h.oauthConfig.Exchange(context.Background(), code)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Token exchange failed: %v", err)})
+		return
+	}
+
+	h.oauthToken = token
+	h.saveToken(token)
+	if err := h.createSheetsService(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to initialize Sheets service: %v", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login successful! You can now use the API.",
+	})
+}
+
+func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if h.getSheetsService() == nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error":    "Not authenticated",
+				"login_at": "http://localhost:8080/auth/login",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+func safeGet(row []interface{}, index int) string {
+	if index < len(row) {
+		return strings.TrimSpace(fmt.Sprintf("%v", row[index]))
+	}
+	return ""
+}
+
+func (h *SheetHandler) fetchSheetRows(tab, rangeStr string) ([]models.Student, error) {
+	spreadsheetID := os.Getenv("SPREADSHEET_ID")
+	fullRange := fmt.Sprintf("%s!%s", tab, rangeStr)
+
+	svc := h.getSheetsService()
+	resp, err := svc.Spreadsheets.Values.Get(spreadsheetID, fullRange).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	var students []models.Student
+	for _, row := range resp.Values {
+		slNo := safeGet(row, 0)
+		if _, err := strconv.Atoi(slNo); err != nil {
+			continue
+		}
+		students = append(students, models.Student{
+			SlNo:             slNo,
+			Year:             safeGet(row, 1),
+			RollNo:           safeGet(row, 2),
+			StudentName:      safeGet(row, 3),
+			CourseCode:       safeGet(row, 4),
+			Department:       safeGet(row, 5),
+			MentorName:       safeGet(row, 6),
+			CumulativePoints: safeGet(row, 7),
+			RedeemedPoints:   safeGet(row, 8),
+			BalancePoints:    safeGet(row, 9),
+			Tab:              tab,
+		})
+	}
+	return students, nil
+}
+
+func (h *SheetHandler) fetchAllTabs() ([]models.Student, []string) {
+	var (
+		mu     sync.Mutex
+		wg     sync.WaitGroup
+		all    []models.Student
+		errors []string
+	)
+
+	// Limit to 5 concurrent requests to avoid rate limiting
+	sem := make(chan struct{}, 5)
+
+	for _, tab := range h.tabs {
+		wg.Add(1)
+		go func(t string) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			var rows []models.Student
+			var err error
+
+			// Retry up to 3 times
+			for attempt := 0; attempt < 3; attempt++ {
+				rows, err = h.fetchSheetRows(t, "A1:J9999")
+				if err == nil {
+					break
+				}
+				if attempt < 2 {
+					time.Sleep(time.Duration(attempt+1) * 300 * time.Millisecond)
+				}
+			}
+
+			mu.Lock()
+			if err != nil {
+				errors = append(errors, fmt.Sprintf("%s: %v", t, err))
+			} else {
+				all = append(all, rows...)
+			}
+			mu.Unlock()
+		}(tab)
+	}
+
+	wg.Wait()
+	return all, errors
+}
+
+func (h *SheetHandler) UniversalSearch(c *gin.Context) {
+	query := strings.TrimSpace(c.Query("q"))
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Query param 'q' is required",
+		})
+		return
+	}
+
+	queryLower := strings.ToLower(strings.TrimSpace(query))
+	queryUpper := strings.ToUpper(strings.TrimSpace(query))
+
+	all, errs := h.fetchAllTabs()
+
+	var results []models.Student
+	for _, s := range all {
+		rollNormalized := strings.ToUpper(strings.ReplaceAll(s.RollNo, " ", ""))
+		queryNormalized := strings.ReplaceAll(queryUpper, " ", "")
+
+		rollMatch := rollNormalized == queryNormalized || strings.Contains(rollNormalized, queryNormalized)
+		nameMatch := strings.Contains(strings.ToLower(s.StudentName), queryLower)
+
+		if rollMatch || nameMatch {
+			results = append(results, s)
+		}
+	}
+
+	if len(results) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"query":   query,
+			"message": "No student found with that name or roll number",
+		})
+		return
+	}
+
+	resp := gin.H{
+		"query": query,
+		"total": len(results),
+		"data":  results,
+	}
+	if len(errs) > 0 {
+		resp["warnings"] = errs
+		resp["data_complete"] = false
+	} else {
+		resp["data_complete"] = true
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *SheetHandler) GetOverallAverageFromSheet(c *gin.Context) {
+	svc := h.getSheetsService()
+	if svc == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Sheets service not initialized"})
+		return
+	}
+
+	spreadsheetID := os.Getenv("SPREADSHEET_ID")
+
+	yearData := []struct {
+		key    string
+		rang   string
+	}{
+		{"year_1", "Details!C11"},
+		{"year_2", "Details!D11"},
+		{"year_3", "Details!F11"},
+		{"year_4", "Details!G11"},
+	}
+
+	yearAverages := gin.H{}
+	var total float64
+	var count int
+
+	for _, yd := range yearData {
+		resp, err := svc.Spreadsheets.Values.Get(spreadsheetID, yd.rang).Do()
+		val := "0"
+		if err == nil && len(resp.Values) > 0 && len(resp.Values[0]) > 0 {
+			val = fmt.Sprintf("%v", resp.Values[0][0])
+		}
+		yearAverages[yd.key] = val
+		if f, err := strconv.ParseFloat(val, 64); err == nil && f > 0 {
+			total += f
+			count++
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"averages":        yearAverages,
+	})
+}

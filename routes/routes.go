@@ -1,0 +1,58 @@
+package routes
+
+import (
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"time"
+
+	"server/handlers"
+	"server/middleware"
+)
+
+func SetupRouter(
+	handler *handlers.SheetHandler,
+	cardHandler *handlers.CardHandler,
+	semesterHandler *handlers.SemesterHandler,
+	adminHandler *handlers.AdminHandler,
+	messHandler *handlers.MessHandler,
+) *gin.Engine {
+
+	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{
+			"http://localhost:5173",
+			"https://bitcentral.vercel.app",
+			"https://bitcenteral.netlify.app",
+		},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "x-admin-secret"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	r.GET("/auth/login", handler.HandleLogin)
+	r.GET("/auth/callback", handler.HandleCallback)
+
+	// Protected API routes
+	api := r.Group("/", handler.RequireAuth())
+	{
+		api.GET("/search", handler.UniversalSearch)
+		api.GET("/averages", handler.GetOverallAverageFromSheet)
+		api.GET("/cards", handlers.GetCards)
+		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
+		
+		api.GET("/mess", messHandler.GetMess)
+		api.GET("/mess/timings", messHandler.GetMealTimings)
+	}
+
+	admin := r.Group("/admin")
+	admin.Use(middleware.RequireAdmin())
+	{
+		admin.GET("/users", adminHandler.GetUsers)
+		admin.DELETE("/users/:uid", adminHandler.DeleteUser)
+		admin.POST("/ps-token", adminHandler.UpdatePSToken)
+	}
+
+	return r
+}

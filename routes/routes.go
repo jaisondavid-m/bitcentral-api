@@ -1,9 +1,10 @@
 package routes
 
 import (
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"time"
 
 	"server/handlers"
 	"server/middleware"
@@ -45,10 +46,12 @@ func SetupRouter(
 	api := r.Group("/", handler.RequireAuth())
 	{
 		api.GET("/search", handler.UniversalSearch)
+		api.GET("/rewards", handler.GetRewardsByRollNo)
 		api.GET("/averages", handler.GetOverallAverageFromSheet)
+
 		api.GET("/cards", handlers.GetCards)
 		api.GET("/semesters/:year", semesterHandler.GetSemesterByYear)
-		
+
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
 	}

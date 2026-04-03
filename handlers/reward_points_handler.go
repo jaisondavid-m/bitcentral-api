@@ -135,7 +135,7 @@ func (h *SheetHandler) RequireAuth() gin.HandlerFunc {
 		if h.getSheetsService() == nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error":    "Not authenticated",
-				"login_at": "http://localhost:8080/auth/login",
+				"login_at": "https://bit-ht4d.onrender.com/auth/login",
 			})
 			c.Abort()
 			return

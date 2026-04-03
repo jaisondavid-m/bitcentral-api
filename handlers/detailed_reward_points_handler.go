@@ -33,9 +33,6 @@ var (
 	rewardsCacheExpiry  time.Time
 )
 
-// Sheet columns (0-indexed):
-// A=0 SL.NO | B=1 DATE | C=2 ACTIVITY CODE | D=3 ROLL NO. | E=4 NAME | F=5 YEAR | G=6 DEPT | H=7 REWARD POINTS | I=8 ACTIVITY TYPE | J=9 ACTIVITY NAME
-
 func normalizeRollNo(s string) string {
 	return strings.ToUpper(strings.ReplaceAll(strings.TrimSpace(s), " ", ""))
 }

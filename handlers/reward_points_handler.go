@@ -25,8 +25,6 @@ var defaultTabs = []string{
 	"FT", "EIE", "ECE", "EEE", "CT", "CSE", "CSD", "CSBS",
 	"CIVIL", "BT", "BIOMEDICAL", "AI&DS", "AGRI", "AIML",
 }
-
-// SheetHandler holds dependencies for auth and sheet operations.
 type SheetHandler struct {
 	oauthConfig *oauth2.Config
 	sheetsSvc   *sheets.Service
@@ -191,8 +189,7 @@ func (h *SheetHandler) fetchAllTabs() ([]models.Student, []string) {
 		all    []models.Student
 		errors []string
 	)
-
-	// Limit to 5 concurrent requests to avoid rate limiting
+	
 	sem := make(chan struct{}, 5)
 
 	for _, tab := range h.tabs {
@@ -204,8 +201,7 @@ func (h *SheetHandler) fetchAllTabs() ([]models.Student, []string) {
 
 			var rows []models.Student
 			var err error
-
-			// Retry up to 3 times
+			
 			for attempt := 0; attempt < 3; attempt++ {
 				rows, err = h.fetchSheetRows(t, "A1:J9999")
 				if err == nil {

@@ -16,6 +16,7 @@ func SetupRouter(
 	semesterHandler *handlers.SemesterHandler,
 	adminHandler *handlers.AdminHandler,
 	messHandler *handlers.MessHandler,
+	leaderboardHandler *handlers.LeaderboardHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -42,7 +43,6 @@ func SetupRouter(
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
 
-	// Protected API routes
 	api := r.Group("/", handler.RequireAuth())
 	{
 		api.GET("/search", handler.UniversalSearch)
@@ -54,6 +54,8 @@ func SetupRouter(
 
 		api.GET("/mess", messHandler.GetMess)
 		api.GET("/mess/timings", messHandler.GetMealTimings)
+
+		api.GET("/top10", leaderboardHandler.GetTop10Students) 
 	}
 
 	admin := r.Group("/admin")

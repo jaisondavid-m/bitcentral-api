@@ -11,13 +11,6 @@ var Cards = []models.Card{
 		BtnText:  "Check RP Now",
 	},
 	{
-		Image:    "./CardImgs/activitypoint.png",
-		Name:     "Activity Point Checker",
-		Keywords: []string{"ap", "activity points", "points", "checker"},
-		Link:     "/apsite",
-		BtnText:  "Check AP Now",
-	},
-	{
 		Image:    "./CardImgs/bitmenu.png",
 		Name:     "Mess Details",
 		Keywords: []string{"mess", "food", "menu", "hostel", "lunch", "dinner"},

@@ -25,16 +25,29 @@ var defaultTabs = []string{
 	"FT", "EIE", "ECE", "EEE", "CT", "CSE", "CSD", "CSBS",
 	"CIVIL", "BT", "BIOMEDICAL", "AI&DS", "AGRI", "AIML",
 }
+
 type SheetHandler struct {
-	oauthConfig *oauth2.Config
-	sheetsSvc   *sheets.Service
-	oauthToken  *oauth2.Token
-	tabs        []string
-	mu          sync.RWMutex
+	oauthConfig  *oauth2.Config
+	sheetsSvc    *sheets.Service
+	oauthToken   *oauth2.Token
+	tabs         []string
+	mu           sync.RWMutex
+	rangeCache   map[string]sheetRangeCacheEntry
+	rangeCacheMu sync.RWMutex
 }
 
+type sheetRangeCacheEntry struct {
+	values    [][]interface{}
+	expiresAt time.Time
+}
+
+const sheetRangeCacheTTL = 2 * time.Minute
+
 func NewSheetHandler() *SheetHandler {
-	return &SheetHandler{tabs: defaultTabs}
+	return &SheetHandler{
+		tabs:       defaultTabs,
+		rangeCache: make(map[string]sheetRangeCacheEntry),
+	}
 }
 
 func (h *SheetHandler) InitOAuth() {
@@ -89,6 +102,10 @@ func (h *SheetHandler) createSheetsService() error {
 	h.mu.Lock()
 	h.sheetsSvc = srv
 	h.mu.Unlock()
+
+	h.rangeCacheMu.Lock()
+	h.rangeCache = make(map[string]sheetRangeCacheEntry)
+	h.rangeCacheMu.Unlock()
 	return nil
 }
 
@@ -149,18 +166,75 @@ func safeGet(row []interface{}, index int) string {
 	return ""
 }
 
-func (h *SheetHandler) fetchSheetRows(tab, rangeStr string) ([]models.Student, error) {
-	spreadsheetID := os.Getenv("SPREADSHEET_ID")
-	fullRange := fmt.Sprintf("%s!%s", tab, rangeStr)
+func deepCopySheetValues(values [][]interface{}) [][]interface{} {
+	out := make([][]interface{}, len(values))
+	for i, row := range values {
+		rowCopy := make([]interface{}, len(row))
+		copy(rowCopy, row)
+		out[i] = rowCopy
+	}
+	return out
+}
+
+func (h *SheetHandler) getCachedRange(cacheKey string) ([][]interface{}, bool) {
+	h.rangeCacheMu.RLock()
+	entry, ok := h.rangeCache[cacheKey]
+	h.rangeCacheMu.RUnlock()
+	if !ok || time.Now().After(entry.expiresAt) {
+		if ok {
+			h.rangeCacheMu.Lock()
+			delete(h.rangeCache, cacheKey)
+			h.rangeCacheMu.Unlock()
+		}
+		return nil, false
+	}
+	return deepCopySheetValues(entry.values), true
+}
+
+func (h *SheetHandler) setCachedRange(cacheKey string, values [][]interface{}, ttl time.Duration) {
+	h.rangeCacheMu.Lock()
+	h.rangeCache[cacheKey] = sheetRangeCacheEntry{
+		values:    deepCopySheetValues(values),
+		expiresAt: time.Now().Add(ttl),
+	}
+	h.rangeCacheMu.Unlock()
+}
+
+func (h *SheetHandler) fetchRangeValuesCached(spreadsheetID, fullRange string, ttl time.Duration) ([][]interface{}, error) {
+	cacheKey := spreadsheetID + "::" + fullRange
+	if cached, ok := h.getCachedRange(cacheKey); ok {
+		return cached, nil
+	}
 
 	svc := h.getSheetsService()
+	if svc == nil {
+		return nil, fmt.Errorf("sheets service not initialized")
+	}
+
 	resp, err := svc.Spreadsheets.Values.Get(spreadsheetID, fullRange).Do()
 	if err != nil {
 		return nil, err
 	}
 
+	if resp.Values == nil {
+		resp.Values = [][]interface{}{}
+	}
+
+	h.setCachedRange(cacheKey, resp.Values, ttl)
+	return deepCopySheetValues(resp.Values), nil
+}
+
+func (h *SheetHandler) fetchSheetRows(tab, rangeStr string) ([]models.Student, error) {
+	spreadsheetID := os.Getenv("SPREADSHEET_ID")
+	fullRange := fmt.Sprintf("%s!%s", tab, rangeStr)
+
+	values, err := h.fetchRangeValuesCached(spreadsheetID, fullRange, sheetRangeCacheTTL)
+	if err != nil {
+		return nil, err
+	}
+
 	var students []models.Student
-	for _, row := range resp.Values {
+	for _, row := range values {
 		slNo := safeGet(row, 0)
 		if _, err := strconv.Atoi(slNo); err != nil {
 			continue
@@ -189,7 +263,7 @@ func (h *SheetHandler) fetchAllTabs() ([]models.Student, []string) {
 		all    []models.Student
 		errors []string
 	)
-	
+
 	sem := make(chan struct{}, 5)
 
 	for _, tab := range h.tabs {
@@ -201,7 +275,7 @@ func (h *SheetHandler) fetchAllTabs() ([]models.Student, []string) {
 
 			var rows []models.Student
 			var err error
-			
+
 			for attempt := 0; attempt < 3; attempt++ {
 				rows, err = h.fetchSheetRows(t, "A1:J9999")
 				if err == nil {
@@ -287,8 +361,8 @@ func (h *SheetHandler) GetOverallAverageFromSheet(c *gin.Context) {
 	spreadsheetID := os.Getenv("SPREADSHEET_ID")
 
 	yearData := []struct {
-		key    string
-		rang   string
+		key  string
+		rang string
 	}{
 		{"year_1", "Details!C11"},
 		{"year_2", "Details!D11"},
@@ -301,10 +375,10 @@ func (h *SheetHandler) GetOverallAverageFromSheet(c *gin.Context) {
 	var count int
 
 	for _, yd := range yearData {
-		resp, err := svc.Spreadsheets.Values.Get(spreadsheetID, yd.rang).Do()
+		values, err := h.fetchRangeValuesCached(spreadsheetID, yd.rang, sheetRangeCacheTTL)
 		val := "0"
-		if err == nil && len(resp.Values) > 0 && len(resp.Values[0]) > 0 {
-			val = fmt.Sprintf("%v", resp.Values[0][0])
+		if err == nil && len(values) > 0 && len(values[0]) > 0 {
+			val = fmt.Sprintf("%v", values[0][0])
 		}
 		yearAverages[yd.key] = val
 		if f, err := strconv.ParseFloat(val, 64); err == nil && f > 0 {
@@ -314,6 +388,6 @@ func (h *SheetHandler) GetOverallAverageFromSheet(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"averages":        yearAverages,
+		"averages": yearAverages,
 	})
 }

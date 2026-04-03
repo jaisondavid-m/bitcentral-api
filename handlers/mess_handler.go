@@ -32,7 +32,6 @@ func NewMessHandler(sh *SheetHandler) *MessHandler {
 	return &MessHandler{sh: sh}
 }
 
-
 func currentMealType() string {
 	loc, _ := time.LoadLocation("Asia/Kolkata")
 	now := time.Now().In(loc)
@@ -54,8 +53,7 @@ func currentMealType() string {
 }
 
 func (h *MessHandler) fetchMessMenu(hostel, date string) (map[string][]string, string, error) {
-	svc := h.sh.getSheetsService()
-	if svc == nil {
+	if h.sh.getSheetsService() == nil {
 		return nil, "", fmt.Errorf("sheets service not initialized")
 	}
 
@@ -68,7 +66,7 @@ func (h *MessHandler) fetchMessMenu(hostel, date string) (map[string][]string, s
 		return nil, "", fmt.Errorf("env var %s is not set", envKey)
 	}
 
-	resp, err := svc.Spreadsheets.Values.Get(spreadsheetID, "Sheet1!A1:D9999").Do()
+	values, err := h.sh.fetchRangeValuesCached(spreadsheetID, "Sheet1!A1:D9999", sheetRangeCacheTTL)
 	if err != nil {
 		return nil, "", fmt.Errorf("sheets API error: %w", err)
 	}
@@ -80,7 +78,7 @@ func (h *MessHandler) fetchMessMenu(hostel, date string) (map[string][]string, s
 	}
 	dayName := ""
 
-	for _, row := range resp.Values {
+	for _, row := range values {
 		if len(row) < 4 {
 			continue
 		}

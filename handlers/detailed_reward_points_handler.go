@@ -136,7 +136,6 @@ func (h *SheetHandler) GetRewardsByRollNo(c *gin.Context) {
 	if rawQuery == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Query param 'roll_no' is required",
-			"example": "/rewards?roll_no=7376251CS221",
 		})
 		return
 	}

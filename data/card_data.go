@@ -25,6 +25,12 @@ var Cards = []models.Card{
 		BtnText:  "Open Now",
 	},
 	{
+		Name:     "PCDP App installation",
+		Keywords: []string{"app", "ps", "pcdp", "otp", "install"},
+		Link:     "/pcdp",
+		BtnText:  "Install App",
+	},
+	{
 		Image:    "./CardImgs/studyimg.jpg",
 		Name:     "Wiki Page",
 		Keywords: []string{"wiki page", "page", "materials", "study"},

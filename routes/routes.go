@@ -62,6 +62,7 @@ func SetupRouter(
 	admin.Use(middleware.RequireAdmin())
 	{
 		admin.GET("/users", adminHandler.GetUsers)
+		admin.GET("/users/update", adminHandler.UpdateUsers)
 		admin.DELETE("/users/:uid", adminHandler.DeleteUser)
 		admin.POST("/ps-token", adminHandler.UpdatePSToken)
 	}

@@ -32,7 +32,8 @@ func main() {
 	semesterHandler := handlers.NewSemesterHandler()
 	adminHandler := handlers.NewAdminHandler()
 	messHandler := handlers.NewMessHandler(sheetHandler)
-	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler) // added
+	leaderboardHandler := handlers.NewLeaderboardHandler(sheetHandler)
+	leaveHandler := handlers.NewLeaveHandler()
 
 	r := routes.SetupRouter(
 		sheetHandler,
@@ -40,7 +41,8 @@ func main() {
 		semesterHandler,
 		adminHandler,
 		messHandler,
-		leaderboardHandler, // added
+		leaderboardHandler,
+		leaveHandler,
 	)
 
 	port := os.Getenv("PORT")

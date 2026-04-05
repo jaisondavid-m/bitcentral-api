@@ -17,6 +17,7 @@ func SetupRouter(
 	adminHandler *handlers.AdminHandler,
 	messHandler *handlers.MessHandler,
 	leaderboardHandler *handlers.LeaderboardHandler,
+	leaveHandler *handlers.LeaveHandler,
 ) *gin.Engine {
 
 	r := gin.Default()
@@ -42,6 +43,7 @@ func SetupRouter(
 
 	r.GET("/auth/login", handler.HandleLogin)
 	r.GET("/auth/callback", handler.HandleCallback)
+	r.GET("/leaves", leaveHandler.GetAllLeaves)
 
 	api := r.Group("/", handler.RequireAuth())
 	{

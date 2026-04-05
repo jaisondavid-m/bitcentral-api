@@ -25,6 +25,13 @@ var Cards = []models.Card{
 		BtnText:  "Open Now",
 	},
 	{
+		Image:    "./CardImgs/leave.png",
+		Name:     "Upcoming Leave Details",
+		Keywords: []string{"leave", "gp", "holiday", "leaves", "vaccation"},
+		Link:     "/leavedetails",
+		BtnText:  "View Now",
+	},
+	{
 		Image:    "./CardImgs/pcdp.png",
 		Name:     "PCDP App installation",
 		Keywords: []string{"app", "ps", "pcdp", "otp", "install"},

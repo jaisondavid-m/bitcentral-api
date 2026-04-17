@@ -69,15 +69,23 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 	}
 
 	index := make(map[string][]RewardActivity)
-	for _, vr := range resp.ValueRanges {
+	for i, vr := range resp.ValueRanges {
+		tabName := rewardSheetTabs[i]
 		for _, row := range vr.Values {
 			rollNorm := normalizeRollNo(safeGet(row, 3))
 			if rollNorm == "" {
 				continue
 			}
+			points := safeGet(row,7)
+
+			if tabName == "Negative Reward Points" && points != "" {
+				if !strings.HasPrefix(points,"-") {
+					points = "-" + points
+				}
+			}
 			index[rollNorm] = append(index[rollNorm], RewardActivity{
 				Date:         safeGet(row, 1),
-				RewardPoints: safeGet(row, 7),
+				RewardPoints: points,
 				ActivityType: safeGet(row, 8),
 				ActivityName: safeGet(row, 9),
 			})

@@ -16,6 +16,7 @@ type RewardActivity struct {
 	RewardPoints string `json:"reward_points"`
 	ActivityType string `json:"activity_type"`
 	ActivityName string `json:"activity_name"`
+	Type         string `json:"type"`
 }
 
 var rewardSheetTabs = []string{
@@ -78,16 +79,17 @@ func (h *SheetHandler) buildRewardsIndex() (map[string][]RewardActivity, error) 
 			}
 			points := safeGet(row,7)
 
+			rewardType := "positive"
+
 			if tabName == "Negative Reward Points" && points != "" {
-				if !strings.HasPrefix(points,"-") {
-					points = "-" + points
-				}
+				rewardType = "negative"
 			}
 			index[rollNorm] = append(index[rollNorm], RewardActivity{
 				Date:         safeGet(row, 1),
 				RewardPoints: points,
 				ActivityType: safeGet(row, 8),
 				ActivityName: safeGet(row, 9),
+				Type: rewardType,
 			})
 		}
 	}

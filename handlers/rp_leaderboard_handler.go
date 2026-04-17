@@ -41,22 +41,26 @@ func parseBalance(s string) float64 {
 	return f
 }
 
-// findTab matches user input like "cse" / "CSE" / "computer science" to the actual tab name.
-// Returns "" if no match found.
+func normalize(s string) string {
+	s = strings.ToUpper(s)
+	s = strings.ReplaceAll(s, "&", "AND")
+	s = strings.ReplaceAll(s, " ", "")
+	return s
+}
+
 func findTab(dept string, tabs []string) string {
-	deptUpper := strings.ToUpper(strings.TrimSpace(dept))
+	deptNorm := normalize(dept)
+
 	for _, tab := range tabs {
-		if strings.ToUpper(tab) == deptUpper {
+		tabNorm := normalize(tab)
+		if tabNorm == deptNorm {
+			return tab
+		}
+		if strings.Contains(tabNorm, deptNorm) || strings.Contains(deptNorm, tabNorm) {
 			return tab
 		}
 	}
-	// fallback: partial match (e.g. "computer science" → "CSE" won't work,
-	// but "CS" → "CSE" will if CSE contains "CS")
-	for _, tab := range tabs {
-		if strings.Contains(strings.ToUpper(tab), deptUpper) {
-			return tab
-		}
-	}
+
 	return ""
 }
 
@@ -101,7 +105,6 @@ func (h *LeaderboardHandler) GetTop10Students(c *gin.Context) {
 	)
 
 	if dept != "" {
-		// Fast path: fetch only the matching tab
 		tab := findTab(dept, h.sheet.tabs)
 		if tab == "" {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -122,12 +125,10 @@ func (h *LeaderboardHandler) GetTop10Students(c *gin.Context) {
 		students = filterByYear(rows, year)
 
 	} else {
-		// year only — must scan all tabs
 		all, e := h.sheet.fetchAllTabs()
 		errs = e
 		students = filterByYear(all, year)
 	}
-
 	if len(students) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{
 			"year":    year,

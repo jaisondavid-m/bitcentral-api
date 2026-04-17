@@ -102,8 +102,8 @@ var Holidays = []models.Holiday{
 		Name:     "Tamil New Year",
 	},
 	{
-		FromDate: "2026-04-24",
-		ToDate:   "2026-04-28",
+		FromDate: "2026-04-22(AN)",
+		ToDate:   "2026-05-03",
 		Name:     "GP",
 	},
 	{

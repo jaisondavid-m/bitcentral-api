@@ -27,7 +27,7 @@ var Cards = []models.Card{
 	{
 		Image:    "./CardImgs/leave.png",
 		Name:     "Upcoming Leave Details",
-		Keywords: []string{"leave", "gp", "holiday", "leaves", "vaccation"},
+		Keywords: []string{"leave", "gp", "holiday", "leaves", "vacation"},
 		Link:     "/leavedetails",
 		BtnText:  "View Now",
 	},
